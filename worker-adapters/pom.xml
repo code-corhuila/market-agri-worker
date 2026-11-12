@@ -12,7 +12,8 @@
     <artifactId>worker-adapters</artifactId>
     <description>Inbound HTTP adapter and outbound adapters. They implement the ports of the core.</description>
 
-    <!-- JDBC, the broker client, the I-07 client and SMTP arrive with the consumer (ADR-016). -->
+    <!-- The I-07 client uses the JDK HttpClient and SMTP a plain socket (ADR-016): no extra library.
+         The broker client arrives with the consumer. -->
     <dependencies>
         <dependency>
             <groupId>co.edu.corhuila.marketagri</groupId>
@@ -22,6 +23,16 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <!-- Plain JDBC with the Hikari pool: no JPA, the schema lives in db/ and is migrated apart (ADR-013). -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-jdbc</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>runtime</scope>
         </dependency>
 
         <dependency>

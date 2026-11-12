@@ -9,6 +9,9 @@ services:
       dockerfile: deploy/Dockerfile
     environment:
       PORT: "8080"
+      DATABASE_URL: jdbc:postgresql://postgres:5432/${PG_DATABASE:?set PG_DATABASE}
+      DATABASE_USER: worker_app
+      DATABASE_PASSWORD: ${WORKER_APP_PASSWORD:?set WORKER_APP_PASSWORD}
     expose:
       - "8080"
     healthcheck:                      # liveness: the only HTTP endpoint of the worker (norm 5.7.1)
