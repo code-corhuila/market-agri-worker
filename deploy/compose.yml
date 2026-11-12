@@ -12,6 +12,17 @@ services:
       DATABASE_URL: jdbc:postgresql://postgres:5432/${PG_DATABASE:?set PG_DATABASE}
       DATABASE_USER: worker_app
       DATABASE_PASSWORD: ${WORKER_APP_PASSWORD:?set WORKER_APP_PASSWORD}
+      AUTH_API_URL: http://auth-api:8080
+      SERVICE_TOKEN: ${WORKER_SERVICE_TOKEN:?set WORKER_SERVICE_TOKEN}
+      PUBLIC_BASE_URL: ${PUBLIC_BASE_URL:?set PUBLIC_BASE_URL}
+      SMTP_HOST: mailpit
+      SMTP_PORT: "1025"
+      MAIL_FROM: ${MAIL_FROM:-notificaciones@market-agri.local}
+      WORKER_BROKER_ENABLED: ${WORKER_BROKER_ENABLED:-true}
+      BROKER_PASSWORD: ${WORKER_BROKER_PASSWORD:?set WORKER_BROKER_PASSWORD}
+    depends_on:                       # postgres lives in market-agri-infra; resolved when included
+      postgres:
+        condition: service_healthy
     expose:
       - "8080"
     healthcheck:                      # liveness: the only HTTP endpoint of the worker (norm 5.7.1)
