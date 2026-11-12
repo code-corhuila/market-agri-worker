@@ -1,6 +1,27 @@
-# Deliberate migration runner of the worker schema (ADR-013). PostgreSQL and worker_app are
-# owned by infra; the worker service itself is added here with its own branch.
+# Included by market-agri-infra (Anexo G). No `ports`: only the API Gateway publishes one, and the
+# worker is never routed by it (ADR-016). PostgreSQL and worker_app are owned by infra;
+# worker-db-migrate is the deliberate migration runner of the worker schema (ADR-013) and the
+# service never migrates.
 services:
+  worker:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    environment:
+      PORT: "8080"
+    expose:
+      - "8080"
+    healthcheck:                      # liveness: the only HTTP endpoint of the worker (norm 5.7.1)
+      test: ["CMD", "wget", "-qO-", "http://localhost:8080/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 30s
+    # Longer than the 20 s graceful shutdown declared in application.yml.
+    stop_grace_period: 25s
+    restart: unless-stopped
+    networks: [platform]
+
   worker-db-migrate:
     image: liquibase/liquibase:4.29
     profiles: [tooling]
