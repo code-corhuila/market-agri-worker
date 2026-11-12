@@ -1,0 +1,1 @@
+DROP INDEX worker.idx_processed_event_processed_at;

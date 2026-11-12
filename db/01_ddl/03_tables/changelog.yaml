@@ -1,0 +1,18 @@
+databaseChangeLog:
+  - changeSet:
+      id: ddl-tables-001
+      author: contreras-elkin
+      labels: "HU-NOTIF-001,ddl,tables"
+      comment: "processed_event - one notice per (event, recipient), recorded after sending (ADR-013, ADR-016)."
+      changes:
+        - sqlFile:
+            path: 001_create_processed_event.sql
+            relativeToChangelogFile: true
+            splitStatements: false
+            stripComments: false
+      rollback:
+        - sqlFile:
+            path: ../../05_rollbacks/01_ddl/03_tables/001_create_processed_event.rollback.sql
+            relativeToChangelogFile: true
+            splitStatements: false
+            stripComments: false
