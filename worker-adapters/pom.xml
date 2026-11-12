@@ -12,9 +12,14 @@
     <artifactId>worker-adapters</artifactId>
     <description>Inbound HTTP adapter and outbound adapters. They implement the ports of the core.</description>
 
-    <!-- The I-07 client uses the JDK HttpClient and SMTP a plain socket (ADR-016): no extra library.
-         The broker client arrives with the consumer. -->
+    <!-- The I-07 client uses the JDK HttpClient and SMTP a plain socket (ADR-016): no extra library. -->
     <dependencies>
+        <!-- The plain RabbitMQ client, as in transactions-api and workflow: nothing can declare topology (ADR-014). -->
+        <dependency>
+            <groupId>com.rabbitmq</groupId>
+            <artifactId>amqp-client</artifactId>
+            <version>5.25.0</version>
+        </dependency>
         <dependency>
             <groupId>co.edu.corhuila.marketagri</groupId>
             <artifactId>worker-core</artifactId>

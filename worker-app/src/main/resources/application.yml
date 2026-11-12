@@ -33,3 +33,25 @@ logging:
   structured:
     format:
       console: ecs
+
+# The notifications of ADR-016. Without the URLs, the token and the sender the service does not start.
+worker:
+  auth-api-url: ${AUTH_API_URL}               # I-07, by its service name in the platform network
+  service-token: ${SERVICE_TOKEN}             # the worker's own token, issued by I-01 (ADR-020)
+  public-base-url: ${PUBLIC_BASE_URL}         # the link of each e-mail: <PUBLIC_BASE_URL>/transacciones/<id>
+  http-timeout: ${HTTP_TIMEOUT:3s}            # per I-07 attempt (Annex D, rule 6)
+  smtp:
+    host: ${SMTP_HOST}                        # Mailpit in every course environment
+    port: ${SMTP_PORT:1025}
+    from: ${MAIL_FROM}
+    timeout: 5s                               # connect and each reply
+  retry:                                      # ADR-014: network, 429, 5xx and SMTP 4xx only
+    attempts: 5
+    base: 1s                                  # full jitter: 0..min(cap, base × 2ⁿ) before attempt n + 1
+    cap: 30s
+  broker:
+    enabled: ${WORKER_BROKER_ENABLED:false}
+    host: ${BROKER_HOST:rabbitmq}
+    port: ${BROKER_PORT:5672}
+    username: ${BROKER_USERNAME:worker_app}
+    password: ${BROKER_PASSWORD:}
