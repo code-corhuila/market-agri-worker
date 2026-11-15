@@ -1,25 +1,39 @@
 # market-agri-worker
 
-> Asynchronous jobs and background processing
+Transversal **notifications worker** (ADR-016) of the **Marketplace Agrícola Huila** distributed
+system: Java 21, Spring Boot 3.5, hexagonal architecture in three Maven modules (Annex D). It turns
+domain events into e-mails — one consumer per event (norm 5.7) — and exposes no business
+interface: only `GET /health` (norm 5.7.1). It is never routed by the API Gateway.
 
-Part of the **LMS Library** distributed system — team `lms-library`, Grupo 2.
-Governance and documentation live in [`library-docs`](https://github.com/code-corhuila/library-docs).
+## Modules
+
+```
+worker-core/      domain/model, application/port/{in,out}, application/usecase — plain Java, no framework
+worker-adapters/  adapter/in/http (liveness) and, with the consumer, adapter/in/messaging and the outbound adapters
+worker-app/       composition root: entry point, wiring and every limit (application.yml)
+db/               the worker schema with Liquibase, as a -db repository (ADR-013): see db/README.md
+deploy/           Dockerfile and compose.yml (service and worker-db-migrate), included by market-agri-infra
+```
+
+`worker-core` declares no framework: a Spring or JDBC type there does not compile. The service
+connects as `worker_app` and never migrates: `worker-db-migrate` does it, from infra.
+
+## What the scaffold already does
+
+| Rule | Where |
+|---|---|
+| `GET /health` → `200 {"status":"UP"}` (liveness, E-60) | `adapter/in/http/HealthController` |
+
+## Run locally
+
+```bash
+./mvnw -B verify                      # build, unit and HTTP tests (Windows: mvnw.cmd)
+java -jar worker-app/target/worker-app-0.0.1-SNAPSHOT.jar
+curl -i http://localhost:8080/health
+```
 
 ## Branching
 
-Three permanent branches. **None of them accepts a direct commit** — you enter through a child
-branch and leave through a Pull Request.
-
-```
-develop  <--PR--  feat/... fix/... chore/...
-qa       <--PR--  qa/...
-main     <--PR--  release/...  hotfix/...
-```
-
-Promotion happens **by re-application** (`git cherry-pick -x`), never by merging one permanent
-branch into another: `merge develop -> qa` and `merge qa -> main` do not exist in this model.
-
-`main` requires **1 approval from `ariel5253`**. On `develop` and `qa` the team sets its own review
-rule.
-
-Full policy: `00-governance/branching-policy.md` in `library-docs`.
+`develop` ← `feat/…`, `fix/…`, `chore/…` (squash); `qa` ← `qa-<SUBTASK-ID>` (rebase, re-applied
+with `git cherry-pick -x`); `main` ← `release.2.Y.Z` with the teacher's approval. Full policy:
+`market-agri-docs/00-governance/git-conventions.md`.
