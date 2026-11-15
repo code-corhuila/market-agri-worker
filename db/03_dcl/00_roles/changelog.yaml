@@ -1,0 +1,18 @@
+databaseChangeLog:
+  - changeSet:
+      id: dcl-roles-001
+      author: contreras-elkin
+      labels: "HU-NOTIF-001,dcl,roles"
+      comment: "worker_reader and worker_writer (NOLOGIN). They carry permissions only on the worker schema."
+      changes:
+        - sqlFile:
+            path: 001_create_roles.sql
+            relativeToChangelogFile: true
+            splitStatements: false
+            stripComments: false
+      rollback:
+        - sqlFile:
+            path: ../../05_rollbacks/03_dcl/00_roles/001_create_roles.rollback.sql
+            relativeToChangelogFile: true
+            splitStatements: false
+            stripComments: false
